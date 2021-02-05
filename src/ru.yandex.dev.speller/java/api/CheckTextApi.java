@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class CheckTextApi {
 
     //    Resource URL
-    private static final String YANDEX_SPELLER_CHECKTEXT_URL =
+    public static final String YANDEX_SPELLER_CHECKTEXT_URL =
             "https://speller.yandex.net/services/spellservice.json/checkText";
 
     //    Check text method parameters to send in request
