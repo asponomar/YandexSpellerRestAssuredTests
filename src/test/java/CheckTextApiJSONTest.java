@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import static enums.Options.*;
 
-public class CheckTextApiJSONTests {
+public class CheckTextApiJSONTest {
 
     @Test
     public void simpleCallWithCorrectWord() {
