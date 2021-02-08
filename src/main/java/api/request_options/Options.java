@@ -1,4 +1,4 @@
-package enums;
+package api.request_options;
 
 public enum Options {
     IGNORE_DIGITS(2),

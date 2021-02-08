@@ -1,6 +1,5 @@
 import api.CheckTextApi;
-import enums.Options;
-import enums.Params;
+import api.request_options.Params;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.apache.http.HttpStatus;
@@ -9,7 +8,8 @@ import org.testng.annotations.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static enums.Options.*;
+import static api.CheckTextApi.*;
+import static api.request_options.Options.*;
 
 public class CheckTextApiJSONTest {
 
@@ -21,8 +21,11 @@ public class CheckTextApiJSONTest {
                 .params(Params.PARAM_LANG, Params.Language.EN)
                 .params(Params.PARAM_OPTIONS, calcOptions(FIND_REPEAT_WORDS))
                 .log().everything()
-                .get(CheckTextApi.YANDEX_SPELLER_CHECKTEXT_URL)
+
+                .when()
+                .get(CheckTextApi.YANDEX_SPELLER_CHECK_TEXT_URL)
                 .prettyPeek()
+
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .contentType(ContentType.JSON)
@@ -36,8 +39,11 @@ public class CheckTextApiJSONTest {
                 .given()
                 .params(Params.PARAM_TEXT, "correct word")
                 .log().all()
-                .get(CheckTextApi.YANDEX_SPELLER_CHECKTEXT_URL)
+
+                .when()
+                .get(CheckTextApi.YANDEX_SPELLER_CHECK_TEXT_URL)
                 .prettyPeek()
+
                 .then()
                 .contentType(ContentType.JSON)
                 .content(Matchers.equalTo("[]"));
@@ -46,130 +52,170 @@ public class CheckTextApiJSONTest {
     @Test
     public void wrongEnWordTest(){
         RestAssured
-                .given()
+                .given(baseRequestConfig())
                 .params(Params.PARAM_TEXT, "korrect")
-                .log().all()
-                .get(CheckTextApi.YANDEX_SPELLER_CHECKTEXT_URL)
+
+                .when()
+                .get()
                 .prettyPeek()
+
                 .then()
+                .spec(successResponse())
                 .content(Matchers.containsString("\"s\":[\"correct\",\"korrekt\",\"correctly\"]"));
     }
 
     @Test
     public void correctRuWordTest(){
         RestAssured
-                .given()
+                .given(baseRequestConfig())
                 .params(Params.PARAM_TEXT, "проверить")
-                .log().all()
-                .get(CheckTextApi.YANDEX_SPELLER_CHECKTEXT_URL)
+
+                .when()
+                .get()
                 .prettyPeek()
+
                 .then()
-                .contentType(ContentType.JSON)
+                .spec(successResponse())
                 .content(Matchers.equalTo("[]"));
     }
 
     @Test
     public void wrongRuWordTest(){
         RestAssured
-                .given()
+                .given(baseRequestConfig())
                 .params(Params.PARAM_TEXT, "праверить")
-                .log().all()
-                .get(CheckTextApi.YANDEX_SPELLER_CHECKTEXT_URL)
+
+                .when()
+                .get()
                 .prettyPeek()
+
                 .then()
+                .spec(successResponse())
                 .content(Matchers.containsString("\"s\":[\"проверить\",\"проверит\",\"прверить\"]"));
     }
 
     @Test
     public void correctEnPlusRuWordTest(){
         RestAssured
-                .given()
+                .given(baseRequestConfig())
                 .params(Params.PARAM_TEXT, "проверить text")
-                .log().all()
-                .get(CheckTextApi.YANDEX_SPELLER_CHECKTEXT_URL)
+
+                .when()
+                .get()
                 .prettyPeek()
+
                 .then()
-                .contentType(ContentType.JSON)
+                .spec(successResponse())
                 .content(Matchers.equalTo("[]"));
     }
 
     @Test
     public void wrongRuCorrectEnWordTest(){
         RestAssured
-                .given()
+                .given(baseRequestConfig())
                 .params(Params.PARAM_TEXT, "праверить text")
                 .log().all()
-                .get(CheckTextApi.YANDEX_SPELLER_CHECKTEXT_URL)
+
+                .when()
+                .get()
                 .prettyPeek()
+
                 .then()
-                .contentType(ContentType.JSON)
+                .spec(successResponse())
                 .content(Matchers.containsString("проверить"));
     }
 
     @Test
     public void wrongEnPlusRuWordTest(){
         RestAssured
-                .given()
+                .given(baseRequestConfig())
                 .params(Params.PARAM_TEXT, "проверить teext")
-                .log().all()
-                .get(CheckTextApi.YANDEX_SPELLER_CHECKTEXT_URL)
+
+                .when()
+                .get()
                 .prettyPeek()
+
                 .then()
-                .contentType(ContentType.JSON)
+                .spec(successResponse())
                 .content(Matchers.containsString("s\":[\"text\",\"texet\",\"etext\"]"));
     }
 
     @Test
     public void ruWordInEnTest(){
         RestAssured
-                .given()
+                .given(baseRequestConfig())
                 .params(Params.PARAM_TEXT, "ghjdthrf")
-                .log().all()
-                .get(CheckTextApi.YANDEX_SPELLER_CHECKTEXT_URL)
+
+                .when()
+                .get()
                 .prettyPeek()
+
                 .then()
-                .contentType(ContentType.JSON)
+                .spec(successResponse())
                 .content(Matchers.containsString("проверка"));
     }
 
     @Test
     public void enWordInRuTest(){
         RestAssured
-                .given()
+                .given(baseRequestConfig())
                 .params(Params.PARAM_TEXT, "сщккусе")
-                .log().all()
-                .get(CheckTextApi.YANDEX_SPELLER_CHECKTEXT_URL)
+
+                .when()
+                .get()
                 .prettyPeek()
+
                 .then()
-                .contentType(ContentType.JSON)
+                .spec(successResponse())
                 .content(Matchers.containsString("correct"));
     }
 
     @Test
     public void ignoreDigitsWithoutOptionsTest(){
         RestAssured
-                .given()
+                .given(baseRequestConfig())
                 .params(Params.PARAM_TEXT, "word123")
-                .log().all()
-                .get(CheckTextApi.YANDEX_SPELLER_CHECKTEXT_URL)
+
+                .when()
+                .get()
                 .prettyPeek()
+
                 .then()
-                .contentType(ContentType.JSON)
+                .spec(successResponse())
                 .content(Matchers.containsString("word 123"));
     }
 
     @Test
     public void ignoreDigitsWithOptionsTest(){
         RestAssured
-                .given()
+                .given(baseRequestConfig())
                 .params(Params.PARAM_TEXT, "проверить text")
                 .params(Params.PARAM_OPTIONS, calcOptions(IGNORE_DIGITS))
-                .log().all()
-                .get(CheckTextApi.YANDEX_SPELLER_CHECKTEXT_URL)
+
+                .when()
+                .get()
                 .prettyPeek()
+
                 .then()
-                .contentType(ContentType.JSON)
+                .spec(successResponse())
                 .content(Matchers.equalTo("[]"));
+    }
+
+    @Test
+    public void badRequestTest(){
+        RestAssured
+                .given(baseRequestConfig())
+                .param(Params.PARAM_TEXT, "some text")
+                .header("some header", "wrong header")
+                .body("wrong body")
+
+                .when()
+                .get()
+                .prettyPeek()
+
+                .then()
+                .spec(badRequestResponse());
+
     }
 
 }

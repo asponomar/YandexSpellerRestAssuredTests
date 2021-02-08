@@ -1,4 +1,4 @@
-package enums;
+package api.request_options;
 
 public class Params {
     public static final String PARAM_TEXT = "text";
